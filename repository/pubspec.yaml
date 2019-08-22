@@ -1,0 +1,17 @@
+name: repository
+description: High-level data management.
+version: 0.0.1
+author: Marcel Garus <marcel.garus@gmail.com>
+homepage: https://github.com/marcelgarus/repository_base
+
+environment:
+  sdk: ">=2.2.2 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  hive: ^0.4.1
+  path_provider: ^1.1.0
+  provider: ^3.0.0
+  rxdart: ^0.22.0
+  shared_preferences: ^0.5.3

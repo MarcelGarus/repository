@@ -1,0 +1,15 @@
+name: repository_hive
+description: A new Flutter package project.
+version: 0.0.1
+author:
+homepage:
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  hive: ^0.4.1+1
+  repository: ^0.0.1
