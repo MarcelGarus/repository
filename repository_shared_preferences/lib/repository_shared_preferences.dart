@@ -2,9 +2,9 @@ library repository_shared_preferences;
 
 import 'dart:async';
 
+import 'package:repository/repository.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart' as sp;
-import 'package:repository_base/repository_base.dart';
 
 /// A wrapper to store [String]s in the system's shared preferences.
 class SharedPreferences extends Repository<String> {
