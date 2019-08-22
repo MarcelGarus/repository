@@ -3,7 +3,7 @@ library repository_hive;
 import 'dart:async';
 
 import 'package:hive/hive.dart';
-import 'package:repository_base/repository_base.dart';
+import 'package:repository/repository.dart';
 
 /// A repository that stores items in a hive database.
 class HiveRepository<Item> extends Repository<Item> {

@@ -1,15 +1,14 @@
 name: repository_hive
-description: A new Flutter package project.
+description: A hive repository.
 version: 0.0.1
-author:
-homepage:
+author: Marcel Garus <marcel.garus@gmail.com>
+homepage: https://github.com/marcelgarus/repositories
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  
   hive: ^0.4.1+1
   repository: ^0.0.1
