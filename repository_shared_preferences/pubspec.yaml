@@ -1,6 +1,6 @@
 name: repository_shared_preferences
 description: A simple repository-based wrapper around the shared preferences.
-version: 1.0.0
+version: 1.0.1
 author: Marcel Garus <marcel.garus@gmail.com>
 homepage: https://github.com/marcelgarus/repository
 
@@ -9,4 +9,5 @@ environment:
 
 dependencies:
   shared_preferences: ^0.5.3+4
-  repository: ^0.0.1
+  repository: ^1.0.0
+  rxdart: ^0.22.2

@@ -1,3 +1,7 @@
+## [1.0.1] - 2019-09-06
+
+* Depend on the newest `repository` package.
+
 ## [1.0.0] - 2019-09-06
 
 * Remove unnecessary dependencies `flutter` and `rxdart`.
