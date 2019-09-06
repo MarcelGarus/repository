@@ -31,9 +31,14 @@ class HiveRepository<Item> extends Repository<Item> {
     if (_box.containsKey(id.id)) {
       yield await _box.get(id.id);
     }
-    await for (var event in _box.watch()) {
-      if (id.matches(event.key)) yield event.value;
-    }
+
+    // Not wrapping this in an async callback leads to unexpected behavior:
+    // https://github.com/dart-lang/sdk/issues/34685
+    yield* () async* {
+      await for (var event in _box.watch()) {
+        if (id.matches(event.key)) yield event.value;
+      }
+    }();
   }
 
   @override
@@ -42,13 +47,17 @@ class HiveRepository<Item> extends Repository<Item> {
 
     Map<Id<Item>, Item> getCurrent() {
       return {
-        for (var entry in _box.toMap().entries)
-          Id<Item>(entry.key): entry.value
+        for (var entry in _box.toMap().entries) Id<Item>(entry.key): entry.value
       };
     }
 
     yield getCurrent();
-    await for (var _ in _box.watch()) yield getCurrent();
+
+    // Not wrapping this in an async callback leads to unexpected behavior:
+    // https://github.com/dart-lang/sdk/issues/34685
+    yield* () async* {
+      await for (var _ in _box.watch()) yield getCurrent();
+    }();
   }
 
   @override
