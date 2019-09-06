@@ -27,7 +27,7 @@ Because that makes repositories modular, they can be composed into more powerful
 
 Here's an example of how that might look:
 
-![repository chains](https://github.com/marcelgarus/repositories/repository/Repository_chains.svg)
+![repository chains](https://github.com/marcelgarus/repository/raw/master/repository/Repository_chains.svg)
 
 ```dart
 CachedRepository<Article>(

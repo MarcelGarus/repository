@@ -1,9 +1,7 @@
-import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
-import '../id.dart';
 import '../repository.dart';
 import 'transformer.dart';
 
