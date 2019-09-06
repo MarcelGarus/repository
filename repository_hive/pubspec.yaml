@@ -1,14 +1,12 @@
 name: repository_hive
-description: A hive repository.
-version: 0.0.1
+description: 'A simple repository-based wrapper around the hive database. 😊'
+version: 1.0.0
 author: Marcel Garus <marcel.garus@gmail.com>
-homepage: https://github.com/marcelgarus/repositories
+homepage: https://github.com/marcelgarus/repository
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
   hive: ^0.4.1+1
-  repository: ^0.0.1
+  repository: ^1.0.0

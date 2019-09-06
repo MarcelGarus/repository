@@ -7,28 +7,48 @@ import 'package:repository/repository.dart';
 
 /// A repository that stores items in a hive database.
 class HiveRepository<Item> extends Repository<Item> {
-  Box box;
+  Future<Box> _boxOpener;
+  Box _box;
 
-  HiveRepository(String key)
-      : box = Hive.box(key),
-        super(isFinite: true, isMutable: true);
+  HiveRepository(String key) : super(isFinite: true, isMutable: true) {
+    _boxOpener = Hive.openBox(key);
+    _boxOpener.then((box) => _box = box);
+  }
+
+  Future<void> _ensureBoxOpened() async {
+    if (_box == null) await _boxOpener;
+  }
+
+  @override
+  void dispose() => _box?.close();
 
   @override
   Stream<Item> fetch(Id<Item> id) async* {
-    if (box.containsKey(id.id)) yield await box.get(id.id);
-    await for (var event in box.watch()) {
+    assert(id != null);
+
+    await _ensureBoxOpened();
+
+    if (_box.containsKey(id.id)) {
+      yield await _box.get(id.id);
+    }
+    await for (var event in _box.watch()) {
       if (id.matches(event.key)) yield event.value;
     }
   }
 
   @override
   Stream<Map<Id<Item>, Item>> fetchAll() async* {
-    var getCurrent = () async => {
-          for (var entry in box.toMap().entries)
-            Id<Item>(entry.key): entry.value
-        };
-    yield await getCurrent();
-    await for (var _ in box.watch()) yield await getCurrent();
+    await _ensureBoxOpened();
+
+    Map<Id<Item>, Item> getCurrent() {
+      return {
+        for (var entry in _box.toMap().entries)
+          Id<Item>(entry.key): entry.value
+      };
+    }
+
+    yield getCurrent();
+    await for (var _ in _box.watch()) yield getCurrent();
   }
 
   @override
@@ -36,16 +56,15 @@ class HiveRepository<Item> extends Repository<Item> {
     assert(id != null);
     assert(item != null);
 
-    await box.put(id.id, item);
+    await _ensureBoxOpened();
+    await _box.put(id.id, item);
   }
 
   @override
   Future<void> remove(Id<Item> id) async {
     assert(id != null);
 
-    await box.delete(id.id);
+    await _ensureBoxOpened();
+    await _box.delete(id.id);
   }
-
-  @override
-  void dispose() => box.close();
 }
