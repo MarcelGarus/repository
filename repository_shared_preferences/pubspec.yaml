@@ -1,15 +1,12 @@
 name: repository_shared_preferences
-description: A shared preferences repository.
-version: 0.0.1
-author:
-homepage:
+description: A simple repository-based wrapper around the shared preferences.
+version: 1.0.0
+author: Marcel Garus <marcel.garus@gmail.com>
+homepage: https://github.com/marcelgarus/repository
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
-  rxdart: ^0.22.1+1
   shared_preferences: ^0.5.3+4
   repository: ^0.0.1
