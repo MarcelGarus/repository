@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:meta/meta.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../id.dart';
 import '../repository.dart';
+
+enum CacheStrategy {
+  alwaysFetchFromSource,
+  onlyFetchFromSourceIfNotInCache,
+}
 
 /// A repository that wraps a source repository. When items are fetched, they
 /// are saved in the cache and the next time the item is fetched, it first
@@ -15,11 +19,15 @@ import '../repository.dart';
 /// cache.
 class CachedRepository<Item> extends RepositoryWithSource<Item, Item> {
   final Repository<Item> cache;
+  CacheStrategy strategy;
+  bool _hasFetchedAllFromSource = false;
 
   CachedRepository({
     @required Repository<Item> source,
     this.cache,
+    this.strategy = CacheStrategy.alwaysFetchFromSource,
   })  : assert(cache != null),
+        assert(strategy != null),
         assert(
             !source.isFinite || cache.isFinite,
             "Provided source repository $source is finite but the cache $cache "
@@ -34,42 +42,40 @@ class CachedRepository<Item> extends RepositoryWithSource<Item, Item> {
         await cache.fetch(id).firstWhere((_) => true, orElse: () => null);
     if (cached != null) yield cached;
 
-    await for (final item in source.fetch(id)) {
-      cache.update(id, item);
-      yield item;
+    if (cached == null || strategy == CacheStrategy.alwaysFetchFromSource) {
+      // Not wrapping this in an async callback leads to unexpected behavior:
+      // https://github.com/dart-lang/sdk/issues/34685
+      yield* () async* {
+        await for (var item in source.fetch(id)) {
+          cache.update(id, item);
+          yield item;
+        }
+      }();
     }
   }
 
   @override
-  Stream<Map<Id<Item>, Item>> fetchAll() {
-    // Why no async* pattern was used: https://stackoverflow.com/questions/56813471/is-it-possible-to-yield-to-an-outer-scope-in-dart
+  Stream<Map<Id<Item>, Item>> fetchAll() async* {
+    if (_hasFetchedAllFromSource) {
+      var all =
+          await cache.fetchAll().firstWhere((a) => true, orElse: () => null);
+      yield all;
+    }
 
-    var sentSourceEntries = false;
-    var controller = BehaviorSubject<Map<Id<Item>, Item>>(
-      onListen: () {},
-      onCancel: () {},
-    );
-
-    cache
-        .fetchAll()
-        .firstWhere((a) => true, orElse: () => null)
-        .then((entries) {
-      if (entries != null && !sentSourceEntries) controller.add(entries);
-    });
-
-    source.fetchAll().listen(
-      (all) {
-        controller.add(all);
-        sentSourceEntries = true;
-        for (final entry in all.entries) {
-          cache.update(entry.key, entry.value);
+    if (!_hasFetchedAllFromSource ||
+        strategy == CacheStrategy.alwaysFetchFromSource) {
+      // Not wrapping this in an async callback leads to unexpected behavior:
+      // https://github.com/dart-lang/sdk/issues/34685
+      yield* () async* {
+        await for (var all in source.fetchAll()) {
+          for (final entry in all.entries) {
+            cache.update(entry.key, entry.value);
+          }
+          _hasFetchedAllFromSource = true;
+          yield all;
         }
-      },
-      onDone: () => controller.close(),
-      onError: (e, st) => controller.addError(e, st),
-    );
-
-    return controller.stream;
+      }();
+    }
   }
 
   @override
