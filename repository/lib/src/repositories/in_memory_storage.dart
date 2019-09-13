@@ -16,8 +16,13 @@ class InMemoryStorage<Item> extends Repository<Item> {
   InMemoryStorage() : super(isFinite: true, isMutable: true);
 
   @override
-  Stream<Item> fetch(Id<Item> id) =>
-      _controllers.putIfAbsent(id, () => BehaviorSubject()).stream;
+  Stream<Item> fetch(Id<Item> id) async* {
+    if (_controllers.containsKey(id)) {
+      yield* _controllers[id].stream;
+    } else {
+      throw ItemNotFound(id);
+    }
+  }
 
   @override
   Stream<Map<Id<Item>, Item>> fetchAll() => _allEntriesController.stream;

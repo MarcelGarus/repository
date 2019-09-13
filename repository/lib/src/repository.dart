@@ -4,6 +4,16 @@ import 'package:meta/meta.dart';
 
 import 'id.dart';
 
+/// Error that can be added to a fetch stream if an item doesn't exist in a
+/// repository.
+class ItemNotFound<T> implements Exception {
+  final Id<T> id;
+
+  ItemNotFound(this.id) : assert(id != null);
+
+  String toString() => "The item with the id $id wasn't found.";
+}
+
 /// Something that can fetch items. Always returns a stream of items.
 ///
 /// If [isFinite] is true, the fetchAll() method should be implemented.
@@ -49,6 +59,7 @@ abstract class Repository<Item> {
         assert(isMutable != null);
 
   /// Fetches a single item with the given [id].
+  /// If the
   Stream<Item> fetch(Id<Item> id);
 
   /// Fetches multiple items with the given [ids].

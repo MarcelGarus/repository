@@ -37,45 +37,121 @@ class CachedRepository<Item> extends RepositoryWithSource<Item, Item> {
         super(source);
 
   @override
-  Stream<Item> fetch(Id<Item> id) async* {
-    var cached =
-        await cache.fetch(id).firstWhere((_) => true, orElse: () => null);
-    if (cached != null) yield cached;
+  Stream<Item> fetch(Id<Item> id) {
+    final controller = StreamController<Item>();
 
-    if (cached == null || strategy == CacheStrategy.alwaysFetchFromSource) {
-      // Not wrapping this in an async callback leads to unexpected behavior:
-      // https://github.com/dart-lang/sdk/issues/34685
-      yield* () async* {
-        await for (var item in source.fetch(id)) {
+    /// Fetches items from the cache and the source simultaneously. When the
+    /// source returns items, cancels the cache fetch and updates the cache.
+    Future<void> alwaysFetchFromSource() async {
+      StreamSubscription<Item> cached =
+          cache.fetch(id).listen(controller.add, onError: (_) {});
+      source.fetch(id).listen(
+        (item) {
+          cached.cancel();
+          controller.add(item);
           cache.update(id, item);
-          yield item;
-        }
-      }();
+        },
+        onError: (error) {
+          cached.cancel();
+          controller.addError(error);
+        },
+        onDone: () {
+          cached.cancel();
+          controller.close();
+        },
+      );
     }
+
+    /// First tries to fetch from the cache. Only if it throws an ItemNotFound
+    /// error, tries to fetch from the source.
+    Future<void> onlyFetchFromSourceIfNotInCache() async {
+      try {
+        controller.add(await cache.fetch(id).first);
+      } on ItemNotFound catch (_) {
+        await source.fetch(id).listen((item) {
+          controller.add(item);
+          cache.update(id, item);
+        }).asFuture();
+      } catch (error) {
+        controller.addError(error);
+      } finally {
+        controller.close();
+      }
+    }
+
+    switch (strategy) {
+      case CacheStrategy.alwaysFetchFromSource:
+        alwaysFetchFromSource();
+        break;
+      case CacheStrategy.onlyFetchFromSourceIfNotInCache:
+        onlyFetchFromSourceIfNotInCache();
+        break;
+      default:
+        throw AssertionError('Unknown cache strategy $strategy.');
+    }
+
+    return controller.stream;
   }
 
   @override
-  Stream<Map<Id<Item>, Item>> fetchAll() async* {
-    if (_hasFetchedAllFromSource) {
-      var all =
-          await cache.fetchAll().firstWhere((a) => true, orElse: () => null);
-      yield all;
-    }
+  Stream<Map<Id<Item>, Item>> fetchAll() {
+    assert(isFinite);
 
-    if (!_hasFetchedAllFromSource ||
-        strategy == CacheStrategy.alwaysFetchFromSource) {
-      // Not wrapping this in an async callback leads to unexpected behavior:
-      // https://github.com/dart-lang/sdk/issues/34685
-      yield* () async* {
-        await for (var all in source.fetchAll()) {
+    final controller = StreamController<Map<Id<Item>, Item>>();
+
+    /// Fetches all items from the cache and the source simultaneously. When
+    /// the source returns items, cancels the cache fetch and updates the
+    /// cache.
+    Future<void> alwaysFetchFromSource() async {
+      StreamSubscription<Map<Id<Item>, Item>> cached =
+          cache.fetchAll().listen(controller.add, onError: (_) {});
+      source.fetchAll().listen(
+        (all) {
+          cached.cancel();
+          controller.add(all);
           for (final entry in all.entries) {
             cache.update(entry.key, entry.value);
           }
-          _hasFetchedAllFromSource = true;
-          yield all;
-        }
-      }();
+        },
+        onError: (error) {
+          cached.cancel();
+          controller.addError(error);
+        },
+        onDone: () {
+          cached.cancel();
+          controller.close();
+        },
+      );
     }
+
+    /// First tries to fetch from the cache. Only if it throws an ItemNotFound
+    /// error, tries to fetch from the source.
+    Future<void> onlyFetchFromSourceIfNotInCache() async {
+      if (_hasFetchedAllFromSource) {
+        await controller.addStream(cache.fetchAll());
+      } else {
+        await source.fetchAll().listen((all) {
+          controller.add(all);
+          for (final entry in all.entries) {
+            cache.update(entry.key, entry.value);
+          }
+        }).asFuture();
+      }
+      controller.close();
+    }
+
+    switch (strategy) {
+      case CacheStrategy.alwaysFetchFromSource:
+        alwaysFetchFromSource();
+        break;
+      case CacheStrategy.onlyFetchFromSourceIfNotInCache:
+        onlyFetchFromSourceIfNotInCache();
+        break;
+      default:
+        throw AssertionError('Unknown cache strategy $strategy.');
+    }
+
+    return controller.stream;
   }
 
   @override
