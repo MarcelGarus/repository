@@ -1,3 +1,9 @@
+## [1.0.3] - 2019-09-13
+
+* Major rewrite of `CachedRepository` to be more efficient and gracefully
+  handle the different cache strategies as well as caches yielding multiple
+  values.
+
 ## [1.0.2] - 2019-09-09
 
 * `CachedRepository` allowing multiple cache strategies.

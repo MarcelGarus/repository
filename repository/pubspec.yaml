@@ -1,6 +1,6 @@
 name: repository
 description: Structure for doing compositional high-level data management.
-version: 1.0.2
+version: 1.0.3
 author: Marcel Garus <marcel.garus@gmail.com>
 homepage: https://github.com/marcelgarus/repository
 
