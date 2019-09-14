@@ -28,9 +28,11 @@ class HiveRepository<Item> extends Repository<Item> {
 
     await _ensureBoxOpened();
 
-    if (_box.containsKey(id.id)) {
-      yield await _box.get(id.id);
+    if (!_box.containsKey(id.id)) {
+      throw ItemNotFound(id);
     }
+
+    yield await _box.get(id.id);
 
     // Not wrapping this in an async callback leads to unexpected behavior:
     // https://github.com/dart-lang/sdk/issues/34685

@@ -1,3 +1,8 @@
+## [1.0.2] - 2019-09-14
+
+* Bump `repository` dependency version and throw `ItemNotFound` error if item
+  is not in box.
+
 ## [1.0.1] - 2019-09-06
 
 * Fixed behavior of `fetch` and `fetchAll` to respect cancelling the stream
