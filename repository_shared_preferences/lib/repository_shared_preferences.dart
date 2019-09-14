@@ -34,8 +34,13 @@ class SharedPreferences extends Repository<String> {
   String _getKey(Id<String> id) => '$_keyPrefix${id.id}';
 
   @override
-  Stream<String> fetch(Id<String> id) =>
-      _controllers[id.id]?.stream ?? Stream<String>.empty().asBroadcastStream();
+  Stream<String> fetch(Id<String> id) {
+    if (_controllers.containsKey(id.id)) {
+      return _controllers[id.id].stream;
+    } else {
+      throw ItemNotFound(id);
+    }
+  }
 
   @override
   Stream<Map<Id<String>, String>> fetchAll() => _allEntriesController.stream;
