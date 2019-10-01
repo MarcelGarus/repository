@@ -1,3 +1,8 @@
+## [1.0.3] - 2019-10-01
+
+* Bump `repository` dependency version and throw `ItemNotFound` error if item
+  is not in box.
+
 ## [1.0.2] - 2019-09-14
 
 * Bump `repository` dependency version and throw `ItemNotFound` error if item

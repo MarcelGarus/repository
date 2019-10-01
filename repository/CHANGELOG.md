@@ -1,3 +1,7 @@
+## [1.0.4] - 2019-10-01
+
+* Add `OnlyCollectionFetcher`.
+
 ## [1.0.3] - 2019-09-13
 
 * Major rewrite of `CachedRepository` to be more efficient and gracefully
