@@ -1,5 +1,6 @@
 name: example
 
 dependencies:
-  repository:
-    path: ../repository
+  repository: ^1.0.4
+  repository_hive: ^1.0.4
+  hive: ^1.0.0
