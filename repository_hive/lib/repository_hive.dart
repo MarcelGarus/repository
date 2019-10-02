@@ -34,13 +34,16 @@ class HiveRepository<Item> extends Repository<Item> {
 
     yield await _box.get(id.id);
 
-    // Not wrapping this in an async callback leads to unexpected behavior:
+    // The following needs to happen in an other microtask. Otherwise, this
+    // leads to unexpected behavior:
     // https://github.com/dart-lang/sdk/issues/34685
-    yield* () async* {
-      await for (var event in _box.watch()) {
-        if (id.matches(event.key)) yield event.value;
+    await Future.delayed(Duration.zero);
+
+    await for (var event in _box.watch()) {
+      if (id.matches(event.key)) {
+        yield event.value;
       }
-    }();
+    }
   }
 
   @override
@@ -55,11 +58,14 @@ class HiveRepository<Item> extends Repository<Item> {
 
     yield getCurrent();
 
-    // Not wrapping this in an async callback leads to unexpected behavior:
+    // The following needs to happen in an other microtask. Otherwise, this
+    // leads to unexpected behavior:
     // https://github.com/dart-lang/sdk/issues/34685
-    yield* () async* {
-      await for (var _ in _box.watch()) yield getCurrent();
-    }();
+    await Future.delayed(Duration.zero);
+
+    await for (var _ in _box.watch()) {
+      yield getCurrent();
+    }
   }
 
   @override
