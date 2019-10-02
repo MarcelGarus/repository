@@ -1,6 +1,6 @@
 name: repository_hive
 description: "A simple repository-based wrapper around the hive database. 😊"
-version: 1.0.3
+version: 1.0.4
 author: Marcel Garus <marcel.garus@gmail.com>
 homepage: https://github.com/marcelgarus/repository
 

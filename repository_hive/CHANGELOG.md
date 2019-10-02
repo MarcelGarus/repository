@@ -1,3 +1,7 @@
+## [1.0.4] - 2019-10-02
+
+* Use more elegant approach to delay watching of boxes in another microtask.
+
 ## [1.0.3] - 2019-10-01
 
 * Bump `repository` dependency version and throw `ItemNotFound` error if item
