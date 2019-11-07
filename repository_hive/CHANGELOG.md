@@ -1,3 +1,7 @@
+## [2.0.0] - 2019-10-02
+
+* Bump `repository` dependency version.
+
 ## [1.0.4] - 2019-10-02
 
 * Use more elegant approach to delay watching of boxes in another microtask.
