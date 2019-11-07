@@ -1,3 +1,10 @@
+## [2.0.0] - 2019-10-02
+
+* Major rewrite of `CachedRepository` so that it returns `CacheItem<Item>`
+  instead of `Item`s. This is a breaking change as it's no longer mutable.
+  But it allows for cooler advanced functionality as it offers new information
+  to users.
+
 ## [1.0.4] - 2019-10-01
 
 * Add `OnlyCollectionFetcher`.
