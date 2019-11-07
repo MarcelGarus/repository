@@ -1,0 +1,17 @@
+name: repository_cached_listview
+description: A ListView for displaying data from a CachedRepository.
+version: 0.0.1
+author: Marcel Garus <marcel.garus@gmail.com>
+homepage: https://github.com/marcelgarus/repository
+
+environment:
+  sdk: ">=2.2.2 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  repository: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
