@@ -11,7 +11,7 @@ import '../repository.dart';
 class InMemoryStorage<Item> extends Repository<Item> {
   final _values = Map<Id<Item>, Item>();
   final _controllers = Map<Id<Item>, BehaviorSubject<Item>>();
-  final _allEntriesController = BehaviorSubject<Map<Id<Item>, Item>>();
+  final _allEntriesController = BehaviorSubject<Map<Id<Item>, Item>>.seeded({});
 
   InMemoryStorage() : super(isFinite: true, isMutable: true);
 
