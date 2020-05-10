@@ -11,5 +11,5 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^0.5.3+4
-  repository: ^1.0.3
+  repository: ^2.0.0
   rxdart: ^0.22.2
